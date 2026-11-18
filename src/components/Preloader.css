@@ -9,13 +9,17 @@
   height: 100%;
   min-height: 100dvh;
   background-color: #f6eae2;
+  overflow: hidden;
   pointer-events: all;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
 }
 
+/* Percentage stays readable in the center */
 .preloader__percent {
+  position: relative;
+  z-index: 1;
   font-family: "IvyMode", sans-serif;
   font-weight: 400;
   font-style: normal;
@@ -25,4 +29,26 @@
   letter-spacing: -0.02em;
   text-align: center;
   white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Fruit layer fills the screen above the % */
+.preloader__rain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.preloader__fruit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
 }
