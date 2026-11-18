@@ -426,6 +426,7 @@ const Preloader = ({ onComplete }) => {
   const overlayRef = useRef(null);
   const percentRef = useRef(null);
   const rainRef = useRef(null);
+  const wallRef = useRef(null);
 
   const counter = useRef({ value: 0 });
   const onCompleteRef = useRef(onComplete);
@@ -439,14 +440,22 @@ const Preloader = ({ onComplete }) => {
     const overlay = overlayRef.current;
     const percent = percentRef.current;
     const rainLayer = rainRef.current;
+    const wall = wallRef.current;
 
-    if (!overlay || !percent || !rainLayer) return;
+    if (!overlay || !percent || !rainLayer || !wall) return;
 
     document.body.style.overflow = "hidden";
 
     counter.current.value = 0;
     percent.textContent = "0%";
     rainStartedRef.current = false;
+
+    // Wall is full-size, scaled from bottom (0 = hidden at bottom)
+    gsap.set(wall, {
+      scaleY: 0,
+      transformOrigin: "50% 100%",
+      force3D: true,
+    });
 
     const fruitRain = createFruitRain(rainLayer);
 
@@ -462,16 +471,15 @@ const Preloader = ({ onComplete }) => {
     const isSmallScreen = window.innerWidth <= 768;
 
     timeline
+      // 1) Count 0% → 100% + fruit rain
       .to(counter.current, {
         value: 100,
-        // A bit longer on phone/tablet so fruits have time to fill
         duration: isSmallScreen ? 5 : 4.2,
         ease: "power2.inOut",
         onUpdate: () => {
           const currentPercent = Math.round(counter.current.value);
           percent.textContent = `${currentPercent}%`;
 
-          // Start rain earlier on small screens
           const startAt = isSmallScreen ? 5 : 10;
           if (!rainStartedRef.current && currentPercent >= startAt) {
             rainStartedRef.current = true;
@@ -482,17 +490,35 @@ const Preloader = ({ onComplete }) => {
           fruitRain.stopSpawning();
         },
       })
-      .to(overlay, {
-        opacity: 0,
-        duration: 0.75,
-        ease: "power2.out",
-        pointerEvents: "none",
+      // 2) Stage 1 — cover: grow from bottom → full screen
+      .to(
+        wall,
+        {
+          scaleY: 1,
+          duration: 0.9,
+          ease: "power3.inOut",
+        },
+        "+=0.12",
+      )
+      // Prepare reveal: hide cream/fruits/% so only the website is under the wall
+      .add(() => {
+        fruitRain.destroy();
+        gsap.set([percent, rainLayer], { autoAlpha: 0 });
+        gsap.set(overlay, { backgroundColor: "transparent" });
+        // Switch origin to top while fully covered (no visual jump)
+        gsap.set(wall, { transformOrigin: "50% 0%" });
+      })
+      // 3) Stage 2 — reveal: shrink from top → 0 (website shows bottom → top)
+      .to(wall, {
+        scaleY: 0,
+        duration: 0.95,
+        ease: "power3.inOut",
       });
 
     return () => {
       fruitRain.destroy();
       timeline.kill();
-      gsap.killTweensOf([counter.current, overlay]);
+      gsap.killTweensOf([counter.current, overlay, wall, percent, rainLayer]);
       document.body.style.overflow = "";
     };
   }, []);
@@ -511,6 +537,8 @@ const Preloader = ({ onComplete }) => {
         0%
       </span>
       <div ref={rainRef} className="preloader__rain" aria-hidden="true" />
+      {/* Rising solid color wall — starts at bottom with height 0 */}
+      <div ref={wallRef} className="preloader__wall" aria-hidden="true" />
     </div>
   );
 };

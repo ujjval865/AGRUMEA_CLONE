@@ -52,3 +52,17 @@
   -webkit-user-drag: none;
   will-change: transform;
 }
+
+/* Solid brand wall — full viewport, animated with scaleY */
+.preloader__wall {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  background-color: #e94e1b;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  pointer-events: none;
+  will-change: transform;
+}
