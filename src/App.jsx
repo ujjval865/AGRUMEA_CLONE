@@ -1,11 +1,12 @@
 import React from "react";
 import Preloader from "./components/Preloader";
-
+import Header from "./components/Header";
 const App = () => {
   return (
     <>
       <Preloader />
-      <div>App</div>
+      <Header />
+
     </>
   );
 };
