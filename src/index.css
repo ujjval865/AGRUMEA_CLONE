@@ -4,34 +4,44 @@
 @font-face {
   font-family: "IvyStyle";
   src: url("/fonts/IvyStyle-Regular.woff2") format("woff2");
-
 }
 
 /* IvyStyle SemiBold */
 @font-face {
   font-family: "IvyStyle";
   src: url("/fonts/IvyStyle-SemiBold.woff2") format("woff2");
-
 }
 
 /* IvyMode Regular */
 @font-face {
   font-family: "IvyMode";
   src: url("/fonts/IvyMode-Regular.woff2") format("woff2");
-
 }
 
 * {
   box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
   margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden !important;
+  position: fixed;
+  inset: 0;
   background-color: #f6eae2;
   color: #292522;
   font-family: "IvyStyle", sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
 }
